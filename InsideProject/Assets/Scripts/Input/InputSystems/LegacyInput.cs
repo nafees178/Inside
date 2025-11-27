@@ -7,6 +7,11 @@ public class LegacyInput : IPlayerInput
         Input.GetAxisRaw("Vertical")
     );
 
+    public Vector2 Look => new Vector2(
+        Input.GetAxis("Mouse X"),
+        Input.GetAxis("Mouse Y")
+    );
+
     public bool JumpPressed => Input.GetButtonDown("Jump");
     public bool RunHeld => Input.GetKey(KeyCode.LeftShift);
 }
