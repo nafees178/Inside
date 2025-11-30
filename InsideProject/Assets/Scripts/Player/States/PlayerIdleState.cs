@@ -24,6 +24,7 @@ public class PlayerIdleState : PlayerBaseState
 
         if (player.JumpPressed)
         {
+            Debug.Log("Jump");
             stateMachine.ChangeState(player.JumpState);
             return;
         }

@@ -12,6 +12,6 @@ public class LegacyInput : IPlayerInput
         Input.GetAxis("Mouse Y")
     );
 
-    public bool JumpPressed => Input.GetButtonDown("Jump");
+    public bool JumpPressed => Input.GetKeyDown(KeyCode.Space);
     public bool RunHeld => Input.GetKey(KeyCode.LeftShift);
 }

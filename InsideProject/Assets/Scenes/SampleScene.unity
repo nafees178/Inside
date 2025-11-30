@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
+  - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -205,8 +206,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.566, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -256,6 +257,32 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!114 &330585548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d52ae0a2c05fe69478a2fbe0ea263d55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 1770229531}
+  enableHeadbob: 1
+  headbobFrequency: 10
+  headbobAmplitude: 0.05
+  headbobRunMultiplier: 1.5
+  headbobSmoothing: 10
+  enableJumpLandBob: 1
+  jumpBobAmount: 0.1
+  landBobAmount: 0.3
+  jumpLandBobReturnSpeed: 8
+  enableShake: 1
+  defaultShakeMagnitude: 0.1
+  defaultShakeDuration: 0.1
+  shakeFrequency: 25
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -438,6 +465,7 @@ GameObject:
   - component: {fileID: 1770229528}
   - component: {fileID: 1770229527}
   - component: {fileID: 1770229530}
+  - component: {fileID: 1770229531}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -507,7 +535,7 @@ Transform:
   m_GameObject: {fileID: 1770229525}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.25, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -538,6 +566,40 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1770229531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770229525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2047cb92bad2b1d4aad93e84e412e816, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerCamera: {fileID: 330585545}
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  cameraLocalOffset: {x: 0, y: 0.8, z: 0}
+  walkSpeed: 4
+  runSpeed: 7
+  mouseSensitivity: 60
+  verticalLookLimit: 85
+  jumpHeight: 1.4
+  gravity: -9.81
+  useHover: 1
+  hoverHeight: 0.3
+  hoverRayLength: 1.32
+  hoverLerpSpeed: 20
+  hoverGroundTolerance: 0.94
+  IsGrounded: 0
+  JumpPressed: 0
+  IsRunning: 0
+  inputDirection: {x: 0, y: 0, z: 0}
+  velocity: {x: 0, y: 0, z: 0}
+  controller: {fileID: 0}
 --- !u!1 &1920108729
 GameObject:
   m_ObjectHideFlags: 0
@@ -651,8 +713,8 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 330585546}
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 1920108733}
+  - {fileID: 330585546}
   - {fileID: 1770229529}

@@ -7,6 +7,9 @@ public class PlayerController : MonoBehaviour
     public Camera playerCamera;
     public LayerMask groundMask;
 
+    [Header("Camera Position")]
+    public Vector3 cameraLocalOffset = new Vector3(0f, 0.8f, 0f);
+
     [Header("Movement")]
     public float walkSpeed = 4f;
     public float runSpeed = 7f;
@@ -56,11 +59,17 @@ public class PlayerController : MonoBehaviour
         MoveState = new PlayerMoveState(this, _stateMachine);
         JumpState = new PlayerJumpState(this, _stateMachine);
         AirState = new PlayerAirState(this, _stateMachine);
+
+        playerCamera.transform.SetParent(transform);
+        playerCamera.transform.localPosition = cameraLocalOffset;
+        playerCamera.transform.localRotation = Quaternion.identity;
     }
 
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+
+
         _stateMachine.Initialize(IdleState);
     }
 
