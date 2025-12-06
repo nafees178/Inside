@@ -29,29 +29,53 @@ public class PlayerController : MonoBehaviour
     public float hoverLerpSpeed = 20f;
     public float hoverGroundTolerance = 0.05f;
 
-    public enum InputSource { Legacy, NewInputSystem }
+    [Header("Dash")]
+    public float dashSpeed = 15f;
+    public float dashDuration = 0.2f;
+    public float dashCooldown = 1f;
 
-    private IPlayerInput _input;
+    [Header("Push Settings")]
+    public bool enablePushing = true;
+    public float pushForce = 5f;
+    public LayerMask pushableLayers;
+    public bool onlyPushOnGround = true;
+
+
+
+    [HideInInspector] public float lastDashTime = -999f;
+    [HideInInspector] public CameraEffects cameraEffects;
+
+    public IPlayerInput _input;
     private StateMachine _stateMachine;
     public PlayerIdleState IdleState { get; private set; }
     public PlayerMoveState MoveState { get; private set; }
     public PlayerJumpState JumpState { get; private set; }
     public PlayerAirState AirState { get; private set; }
+    public PlayerDashState DashState { get; private set; }
 
     [HideInInspector] public bool IsGrounded;
     [HideInInspector] public bool JumpPressed;
     [HideInInspector] public bool IsRunning;
+    [HideInInspector] public bool DashPressed;
     [HideInInspector] public Vector3 inputDirection;
     [HideInInspector] public Vector3 velocity;
 
     [HideInInspector] public CharacterController controller;
 
+    public enum Controller
+    {
+        Player,
+        Ghost
+    }
+
+    public Controller gameObjectController = Controller.Player;
+
     private float _cameraPitch;
 
     private void Awake()
     {
-        controller = GetComponent<CharacterController>();
         SetupInput();
+        controller = GetComponent<CharacterController>();
 
         _stateMachine = new StateMachine();
 
@@ -59,17 +83,18 @@ public class PlayerController : MonoBehaviour
         MoveState = new PlayerMoveState(this, _stateMachine);
         JumpState = new PlayerJumpState(this, _stateMachine);
         AirState = new PlayerAirState(this, _stateMachine);
+        DashState = new PlayerDashState(this, _stateMachine);
+
 
         playerCamera.transform.SetParent(transform);
         playerCamera.transform.localPosition = cameraLocalOffset;
         playerCamera.transform.localRotation = Quaternion.identity;
+        cameraEffects = playerCamera.GetComponent<CameraEffects>();
+
     }
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-
-
         _stateMachine.Initialize(IdleState);
     }
 
@@ -89,7 +114,18 @@ public class PlayerController : MonoBehaviour
 
     private void SetupInput()
     {
-         _input = new LegacyInput();
+        switch (gameObjectController)
+        {
+            case Controller.Player:
+                _input = GetComponent<LegacyInput>();
+                break;
+            case Controller.Ghost:
+                _input = GetComponent<PlaybackInput>();
+                break;
+            default:
+                break;
+        }
+        
     }
 
     private void ReadInput()
@@ -97,6 +133,7 @@ public class PlayerController : MonoBehaviour
         Vector2 move = _input.Move;
         IsRunning = _input.RunHeld;
         JumpPressed = _input.JumpPressed;
+        DashPressed = _input.DashPressed;
 
         Vector3 forward = playerCamera.transform.forward;
         forward.y = 0;
@@ -118,10 +155,80 @@ public class PlayerController : MonoBehaviour
 
         transform.Rotate(Vector3.up * yaw);
 
+
         _cameraPitch -= pitch;
         _cameraPitch = Mathf.Clamp(_cameraPitch, -verticalLookLimit, verticalLookLimit);
         playerCamera.transform.localEulerAngles = new Vector3(_cameraPitch, 0f, 0f);
+
     }
+
+    public void LaunchFromExternal(Vector3 launchDirection, float launchHeight)
+    {
+        if (launchDirection.sqrMagnitude > 0.0001f)
+            launchDirection.Normalize();
+        else
+            launchDirection = Vector3.up;
+
+        float verticalVelocity = Mathf.Sqrt(launchHeight * -2f * gravity);
+
+        Vector3 horizontalDir = new Vector3(launchDirection.x, 0f, launchDirection.z).normalized;
+
+        float horizontalSpeed = launchHeight;
+
+        velocity = new Vector3(
+            horizontalDir.x * horizontalSpeed,
+            verticalVelocity,
+            horizontalDir.z * horizontalSpeed
+        );
+
+        IsGrounded = false;
+
+        _stateMachine.ChangeState(AirState);
+
+        if (cameraEffects != null)
+        {
+            cameraEffects.Shake(0.2f, 0.15f);
+            cameraEffects.OnDash(launchDirection);
+        }
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (!enablePushing)
+            return;
+
+        Rigidbody rb = hit.rigidbody;
+        if (rb == null || rb.isKinematic)
+            return;
+
+        if (pushableLayers.value != 0)
+        {
+            if ((pushableLayers.value & (1 << hit.gameObject.layer)) == 0)
+                return;
+        }
+
+        if (onlyPushOnGround && !IsGrounded)
+            return;
+
+        if (hit.moveDirection.y < -0.3f)
+            return;
+
+        Vector3 pushDir = new Vector3(hit.moveDirection.x, 0f, hit.moveDirection.z);
+
+        if (pushDir.sqrMagnitude < 0.0001f)
+            return;
+
+        pushDir.Normalize();
+        rb.AddForce(pushDir * pushForce, ForceMode.VelocityChange);
+    }
+
+
+
+    public bool CanDash()
+    {
+        return Time.time >= lastDashTime + dashCooldown;
+    }
+
 
     public bool TryGetHoverGround(out RaycastHit hit)
     {

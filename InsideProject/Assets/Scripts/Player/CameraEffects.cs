@@ -1,7 +1,7 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
-public class FpsCameraEffects : MonoBehaviour
+public class CameraEffects : MonoBehaviour
 {
     [Header("References")]
     public PlayerController player;
@@ -29,7 +29,15 @@ public class FpsCameraEffects : MonoBehaviour
     public bool enableFovKick = true;
     public float sprintFovIncrease = 8f;      
     public float fovLerpSpeed = 10f;          
-    public float minSpeedForFovKick = 0.2f;   
+    public float minSpeedForFovKick = 0.2f;
+
+    [Header("Dash Effects")]
+    public bool enableDashEffects = true;
+    public float dashFovIncrease = 12f;
+    public float dashFovDuration = 0.25f;
+    public float dashTiltAmount = 8f;
+    public float dashTiltReturnSpeed = 10f;
+
 
     private Camera _cam;
     private Vector3 _initialLocalPos;
@@ -48,6 +56,10 @@ public class FpsCameraEffects : MonoBehaviour
 
     private float _baseFov;
     private float _targetFov;
+
+    private float _dashFovTimer;
+    private float _currentDashTiltZ;
+    private float _targetDashTiltZ;
 
     private void Awake()
     {
@@ -80,6 +92,23 @@ public class FpsCameraEffects : MonoBehaviour
         );
 
         _wasGroundedLastFrame = player.IsGrounded;
+
+        if (enableDashEffects)
+        {
+            if (_dashFovTimer <= 0f)
+                _targetDashTiltZ = 0f;
+
+            _currentDashTiltZ = Mathf.Lerp(
+                _currentDashTiltZ,
+                _targetDashTiltZ,
+                Time.deltaTime * dashTiltReturnSpeed
+            );
+
+            Vector3 angles = transform.localEulerAngles;
+            angles.z = _currentDashTiltZ;
+            transform.localEulerAngles = angles;
+        }
+
     }
     private void UpdateHeadbob()
     {
@@ -165,28 +194,50 @@ public class FpsCameraEffects : MonoBehaviour
             _shakeOffset = Vector3.Lerp(_shakeOffset, Vector3.zero, Time.deltaTime * 10f);
         }
     }
-    private void UpdateFovKick()
+
+    public void OnDash(Vector3 dashDirection)
     {
-        if (!enableFovKick)
+        if (!enableDashEffects) return;
+
+        _dashFovTimer = dashFovDuration;
+
+        Vector3 localDir = player.transform.InverseTransformDirection(dashDirection.normalized);
+
+        if (Mathf.Abs(localDir.x) > 0.1f)
         {
-            _targetFov = _baseFov;
-            _cam.fieldOfView = Mathf.Lerp(_cam.fieldOfView, _targetFov, Time.deltaTime * fovLerpSpeed);
-            return;
-        }
-
-        Vector3 horizontalVel = new Vector3(player.velocity.x, 0f, player.velocity.z);
-        float speed = horizontalVel.magnitude;
-
-        bool sprintingWithSpeed = player.IsRunning && speed > minSpeedForFovKick;
-
-        if (sprintingWithSpeed)
-        {
-            _targetFov = _baseFov + sprintFovIncrease;
+            _targetDashTiltZ = -Mathf.Sign(localDir.x) * dashTiltAmount;
         }
         else
         {
-            _targetFov = _baseFov;
+            _targetDashTiltZ = -dashTiltAmount * 0.5f;
         }
+
+        Shake(defaultShakeMagnitude * 1.5f, defaultShakeDuration * 1.2f);
+    }
+
+    private void UpdateFovKick()
+    {
+        float baseTarget = _baseFov;
+
+        if (enableFovKick)
+        {
+            Vector3 horizontalVel = new Vector3(player.velocity.x, 0f, player.velocity.z);
+            float speed = horizontalVel.magnitude;
+            bool sprintingWithSpeed = player.IsRunning && speed > minSpeedForFovKick;
+
+            if (sprintingWithSpeed)
+                baseTarget += sprintFovIncrease;
+        }
+
+        float dashExtra = 0f;
+        if (enableDashEffects && _dashFovTimer > 0f)
+        {
+            _dashFovTimer -= Time.deltaTime;
+            float t = Mathf.Clamp01(_dashFovTimer / dashFovDuration);
+            dashExtra = dashFovIncrease * t;
+        }
+
+        _targetFov = baseTarget + dashExtra;
 
         _cam.fieldOfView = Mathf.Lerp(
             _cam.fieldOfView,
@@ -194,6 +245,7 @@ public class FpsCameraEffects : MonoBehaviour
             Time.deltaTime * fovLerpSpeed
         );
     }
+
 
     public void Shake(float magnitude, float duration)
     {

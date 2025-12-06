@@ -23,6 +23,12 @@ public class PlayerJumpState : PlayerBaseState
 
     public override void LogicUpdate()
     {
+        if (player.DashPressed && player.CanDash())
+        {
+            stateMachine.ChangeState(player.DashState);
+            return;
+        }
+
         if (player.velocity.y <= 0f)
         {
             stateMachine.ChangeState(player.AirState);

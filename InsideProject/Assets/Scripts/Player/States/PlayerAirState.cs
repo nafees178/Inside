@@ -11,6 +11,12 @@ public class PlayerAirState : PlayerBaseState
     {
         bool grounded = false;
 
+        if (player.DashPressed && player.CanDash())
+        {
+            stateMachine.ChangeState(player.DashState);
+            return;
+        }
+
         if (player.useHover)
         {
             if (player.TryGetHoverGround(out RaycastHit hit))

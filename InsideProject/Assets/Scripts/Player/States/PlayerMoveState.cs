@@ -18,6 +18,13 @@ public class PlayerMoveState : PlayerBaseState
             return;
         }
 
+        if (player.DashPressed && player.CanDash())
+        {
+            stateMachine.ChangeState(player.DashState);
+            return;
+        }
+
+
         if (player.inputDirection.sqrMagnitude <= 0.01f)
         {
             stateMachine.ChangeState(player.IdleState);

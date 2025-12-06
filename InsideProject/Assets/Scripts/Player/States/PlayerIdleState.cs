@@ -22,6 +22,13 @@ public class PlayerIdleState : PlayerBaseState
             return;
         }
 
+        if (player.DashPressed && player.CanDash())
+        {
+            stateMachine.ChangeState(player.DashState);
+            return;
+        }
+
+
         if (player.JumpPressed)
         {
             Debug.Log("Jump");
