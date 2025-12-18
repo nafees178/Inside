@@ -28,19 +28,22 @@ public class PlayerIdleState : PlayerBaseState
             return;
         }
 
+        bool canJump = player.IsGrounded || (Time.time - player.lastGroundedTime <= player.coyoteTime);
 
-        if (player.JumpPressed)
+        if (player.JumpPressed && canJump)
         {
-            Debug.Log("Jump");
             stateMachine.ChangeState(player.JumpState);
             return;
         }
+
 
         if (player.inputDirection.sqrMagnitude > 0.01f)
         {
             stateMachine.ChangeState(player.MoveState);
             return;
         }
+
+        player.lastGroundedTime = Time.time;
     }
 
     public override void PhysicsUpdate()

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class LegacyInput : MonoBehaviour, IPlayerInput
 {
@@ -7,10 +8,7 @@ public class LegacyInput : MonoBehaviour, IPlayerInput
         Input.GetAxisRaw("Vertical")
     );
 
-    public Vector2 Look => new Vector2(
-        Input.GetAxis("Mouse X"),
-        Input.GetAxis("Mouse Y")
-    );
+    public Vector2 Look => Mouse.current.delta.ReadValue();
 
     public bool JumpPressed => Input.GetKeyDown(KeyCode.Space);
     public bool RunHeld => Input.GetKey(KeyCode.LeftShift);

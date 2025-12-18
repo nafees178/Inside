@@ -32,7 +32,7 @@ public abstract class PlayerBaseState : IState
 
     private void HandleHoverVertical()
     {
-        if (player.TryGetHoverGround(out RaycastHit hit))
+        if (player.TryGetHoverGroundSphere(out RaycastHit hit))
         {
             float targetY = hit.point.y + player.hoverHeight;
             Vector3 pos = player.transform.position;

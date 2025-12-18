@@ -19,13 +19,15 @@ public class PlayerAirState : PlayerBaseState
 
         if (player.useHover)
         {
-            if (player.TryGetHoverGround(out RaycastHit hit))
+            if (player.TryGetHoverGroundSphere(out RaycastHit hit))
             {
                 float targetY = hit.point.y + player.hoverHeight;
                 float dist = Mathf.Abs(player.transform.position.y - targetY);
+
                 grounded = dist <= player.hoverGroundTolerance && player.velocity.y <= 0f;
             }
         }
+
         else
         {
             grounded = player.controller.isGrounded && player.velocity.y <= 0f;
@@ -34,7 +36,7 @@ public class PlayerAirState : PlayerBaseState
         if (grounded)
         {
             player.IsGrounded = true;
-
+            player.lastGroundedTime = Time.time;
             if (player.inputDirection.sqrMagnitude > 0.01f)
                 stateMachine.ChangeState(player.MoveState);
             else
@@ -43,6 +45,20 @@ public class PlayerAirState : PlayerBaseState
             return;
         }
     }
+
+    private void ApplyBetterAirGravity()
+    {
+        float gravityMultiplier = player.velocity.y < 0f
+            ? player.fallGravityMultiplier
+            : 1f;
+
+        player.velocity = new Vector3(
+            player.velocity.x,
+            player.velocity.y + player.gravity * gravityMultiplier * Time.fixedDeltaTime,
+            player.velocity.z
+        );
+    }
+
 
     public override void PhysicsUpdate()
     {
@@ -55,7 +71,7 @@ public class PlayerAirState : PlayerBaseState
             horizontalVelocity.z
         );
 
-        ApplyGravity();
+        ApplyBetterAirGravity();
         MoveFull();
     }
 }

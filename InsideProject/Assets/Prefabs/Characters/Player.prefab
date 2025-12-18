@@ -114,8 +114,8 @@ CharacterController:
   m_Height: 2
   m_Radius: 0.5
   m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
+  m_StepOffset: 0.5
+  m_SkinWidth: 0.1
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &4795802881893828115
@@ -133,30 +133,42 @@ MonoBehaviour:
   playerCamera: {fileID: 6997051108847454759}
   groundMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 65
   cameraLocalOffset: {x: 0, y: 0.8, z: 0}
   walkSpeed: 4
   runSpeed: 7
-  mouseSensitivity: 60
+  mouseSensitivity: 100
   verticalLookLimit: 85
-  jumpHeight: 1.4
-  gravity: -9.81
-  useHover: 1
+  jumpHeight: 3
+  coyoteTime: 0.3
+  gravity: -25
+  fallGravityMultiplier: 1.8
+  lowJumpGravityMultiplier: 1.6
+  useHover: 0
   hoverHeight: 0.3
-  hoverRayLength: 1.32
+  hoverRayLength: 2
+  hoverSphereRadiusMultiplier: 0.9
   hoverLerpSpeed: 20
-  hoverGroundTolerance: 0.94
-  dashSpeed: 15
-  dashDuration: 0.3
+  hoverGroundTolerance: 0.05
+  dashSpeed: 30
+  dashDuration: 0.2
   dashCooldown: 1
+  enablePushing: 1
+  pushForce: 5
+  pushableLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  onlyPushOnGround: 1
   lastDashTime: -999
   cameraEffects: {fileID: 0}
-  IsGrounded: 0
+  IsGrounded: 1
+  lastGroundedTime: 304.69
+  canDash: 0
   JumpPressed: 0
   IsRunning: 0
   DashPressed: 0
   inputDirection: {x: 0, y: 0, z: 0}
-  velocity: {x: 0, y: 0, z: 0}
+  velocity: {x: 0, y: -2.4999998, z: 0}
   controller: {fileID: 0}
   gameObjectController: 0
 --- !u!114 &8422520849552564105

@@ -20,12 +20,19 @@ public class PlayerController : MonoBehaviour
 
     [Header("Jump / Gravity")]
     public float jumpHeight = 1.4f;
-    public float gravity = -9.81f;
+    public float coyoteTime = 0.1f;
+    public float gravity = -30f;
+
+    [Header("Jump Feel")]
+    public float fallGravityMultiplier = 2.8f;
+    public float lowJumpGravityMultiplier = 2.2f;
+
 
     [Header("Hover Settings")]
     public bool useHover = true;
     public float hoverHeight = 0.3f;
     public float hoverRayLength = 2f;
+    public float hoverSphereRadiusMultiplier = 0.9f;
     public float hoverLerpSpeed = 20f;
     public float hoverGroundTolerance = 0.05f;
 
@@ -42,7 +49,7 @@ public class PlayerController : MonoBehaviour
 
 
 
-    [HideInInspector] public float lastDashTime = -999f;
+    public float lastDashTime = -999f;
     [HideInInspector] public CameraEffects cameraEffects;
 
     public IPlayerInput _input;
@@ -52,13 +59,17 @@ public class PlayerController : MonoBehaviour
     public PlayerJumpState JumpState { get; private set; }
     public PlayerAirState AirState { get; private set; }
     public PlayerDashState DashState { get; private set; }
-
-    [HideInInspector] public bool IsGrounded;
+    
+    public bool IsGrounded;
+    public float lastGroundedTime;
+    public bool canDash;
     [HideInInspector] public bool JumpPressed;
     [HideInInspector] public bool IsRunning;
     [HideInInspector] public bool DashPressed;
     [HideInInspector] public Vector3 inputDirection;
     [HideInInspector] public Vector3 velocity;
+
+
 
     [HideInInspector] public CharacterController controller;
 
@@ -96,13 +107,16 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         _stateMachine.Initialize(IdleState);
+        playerCamera.gameObject.SetActive(false);
+        playerCamera.gameObject.SetActive(true);
+
     }
 
     private void Update()
     {
         ReadInput();
         LookInput();
-
+        canDash = CanDash();
         _stateMachine.CurrentState?.HandleInput();
         _stateMachine.CurrentState?.LogicUpdate();
     }
@@ -226,15 +240,27 @@ public class PlayerController : MonoBehaviour
 
     public bool CanDash()
     {
-        return Time.time >= lastDashTime + dashCooldown;
+        return (Time.time - lastDashTime) >= dashCooldown;
     }
 
 
-    public bool TryGetHoverGround(out RaycastHit hit)
+    public bool TryGetHoverGroundSphere(out RaycastHit hit)
     {
-        Vector3 origin = transform.position + Vector3.up * 0.2f;
-        return Physics.Raycast(origin, Vector3.down, out hit, hoverRayLength, groundMask);
+        float radius = controller.radius * hoverSphereRadiusMultiplier;
+
+        Vector3 origin = transform.position + Vector3.up * (radius + 0.1f);
+
+        return Physics.SphereCast(
+            origin,
+            radius,
+            Vector3.down,
+            out hit,
+            hoverRayLength,
+            groundMask,
+            QueryTriggerInteraction.Ignore
+        );
     }
+
 
     private void OnDrawGizmosSelected()
     {

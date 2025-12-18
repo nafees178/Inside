@@ -12,6 +12,7 @@ public class PlayerDashState : PlayerBaseState
 
     public override void Enter()
     {
+        Debug.Log("Entered Dash state");
         _dashTimer = 0f;
 
         Vector3 dir = player.inputDirection;
