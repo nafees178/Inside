@@ -5,11 +5,12 @@ TagManager:
   serializedVersion: 3
   tags:
   - Triggerer
+  - Ghost
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Death
   - Water
   - UI
   - Pushable

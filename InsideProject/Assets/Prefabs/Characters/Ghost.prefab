@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 927858439750109928}
   m_Layer: 0
   m_Name: Ghost
-  m_TagString: Triggerer
+  m_TagString: Ghost
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -137,7 +137,7 @@ MonoBehaviour:
   cameraLocalOffset: {x: 0, y: 0.8, z: 0}
   walkSpeed: 4
   runSpeed: 7
-  mouseSensitivity: 100
+  mouseSensitivity: 5
   verticalLookLimit: 85
   jumpHeight: 3
   coyoteTime: 0.3

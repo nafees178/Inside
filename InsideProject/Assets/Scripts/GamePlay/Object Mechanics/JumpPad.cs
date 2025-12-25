@@ -11,7 +11,7 @@ public class JumpPad : MonoBehaviour
     [Header("Jump Pad Settings")]
     [SerializeField] bool affectPlayer = true;
     [SerializeField] bool affectPushables = true;
-    [SerializeField] string pushableTag = "Triggerer";
+    [SerializeField] string pushableTag = "Ghost";
 
     private void Reset()
     {

@@ -6,6 +6,7 @@ public class Trigger : MonoBehaviour
     [Header("Trigger Properties")]
     [SerializeField] bool canTriggeredByPlayer = true;
     [SerializeField] bool canTriggeredByTriggerer = true;
+    [SerializeField] bool canTriggeredByGhost = true;
 
     [Header("Trigger Events")]
     public UnityEvent OnTriggered;
@@ -24,6 +25,11 @@ public class Trigger : MonoBehaviour
         {
             OnTriggered.Invoke();
         }
+
+        if(other.CompareTag("Ghost") && canTriggeredByGhost)
+        {
+            OnTriggered.Invoke();
+        }
     }
 
     private void OnTriggerExit(Collider other)
@@ -34,6 +40,11 @@ public class Trigger : MonoBehaviour
         }
 
         if (other.CompareTag("Triggerer") && canTriggeredByTriggerer)
+        {
+            OnTriggeredFalse.Invoke();
+        }
+
+        if (other.CompareTag("Ghost") && canTriggeredByGhost)
         {
             OnTriggeredFalse.Invoke();
         }
