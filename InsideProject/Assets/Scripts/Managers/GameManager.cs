@@ -4,7 +4,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    ResetState[] changingObjects; 
+    ResetState[] changingObjects;
 
     private void Awake()
     {
