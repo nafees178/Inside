@@ -12,21 +12,15 @@ public class Trigger : MonoBehaviour
     public UnityEvent OnTriggered;
     public UnityEvent OnTriggeredFalse;
 
-
+    private int activeTriggerCount = 0;
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.CompareTag("Player") && canTriggeredByPlayer)
-        {
-            OnTriggered.Invoke();
-        }
+        if (!IsValidTrigger(other)) return;
 
-        if(other.CompareTag("Triggerer") && canTriggeredByTriggerer)
-        {
-            OnTriggered.Invoke();
-        }
+        activeTriggerCount++;
 
-        if(other.CompareTag("Ghost") && canTriggeredByGhost)
+        if (activeTriggerCount == 1)
         {
             OnTriggered.Invoke();
         }
@@ -34,19 +28,22 @@ public class Trigger : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player") && canTriggeredByPlayer)
-        {
-            OnTriggeredFalse.Invoke();
-        }
+        if (!IsValidTrigger(other)) return;
 
-        if (other.CompareTag("Triggerer") && canTriggeredByTriggerer)
-        {
-            OnTriggeredFalse.Invoke();
-        }
+        activeTriggerCount--;
+        activeTriggerCount = Mathf.Max(0, activeTriggerCount);
 
-        if (other.CompareTag("Ghost") && canTriggeredByGhost)
+        if (activeTriggerCount == 0)
         {
             OnTriggeredFalse.Invoke();
         }
+    }
+
+    private bool IsValidTrigger(Collider other)
+    {
+        return
+            (other.CompareTag("Player") && canTriggeredByPlayer) ||
+            (other.CompareTag("Triggerer") && canTriggeredByTriggerer) ||
+            (other.CompareTag("Ghost") && canTriggeredByGhost);
     }
 }

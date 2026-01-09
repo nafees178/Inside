@@ -15,6 +15,8 @@ public class LegacyInput : MonoBehaviour, IPlayerInput
 
     public bool recordKeyPressed => Input.GetKeyDown(KeyCode.R);
 
+    public bool resetCheckPointKeyPressed => Input.GetKeyDown(KeyCode.Q);
+
     public bool DashPressed => Input.GetKeyDown(KeyCode.LeftControl);
 
 

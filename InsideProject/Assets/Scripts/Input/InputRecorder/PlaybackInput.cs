@@ -24,6 +24,8 @@ public class PlaybackInput : MonoBehaviour, IPlayerInput
 
     public bool recordKeyPressed => false;
 
+    public bool resetCheckPointKeyPressed => false;
+
     public bool Loop = false;
 
     public void BeginPlayback(List<InputFrame> sourceFrames)

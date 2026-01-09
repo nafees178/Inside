@@ -9,6 +9,8 @@ public interface IPlayerInput
 
     bool recordKeyPressed { get; }
 
+    bool resetCheckPointKeyPressed { get; }
+
     bool DashPressed { get; }
 
 }

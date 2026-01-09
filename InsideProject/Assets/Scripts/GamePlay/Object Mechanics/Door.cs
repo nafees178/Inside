@@ -1,6 +1,5 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class Door : MonoBehaviour
 {
@@ -11,30 +10,62 @@ public class Door : MonoBehaviour
     [Header("Movement")]
     public float moveSpeed = 2f;
 
+    [Header("Trigger Requirement")]
+    public bool useTriggerRequirement = false;  
+    public int requiredTriggerCount = 2;
+
+    private int currentTriggerCount = 0;
+
     private Coroutine moveRoutine;
-    public bool isOpen = false;
+    private bool isOpen = false;
+
+    private void Update()
+    {
+        //if (Vector3.Distance(transform.position, closedPoint.position) < 0.01f)
+        //    isOpen = false;
+        //else if (Vector3.Distance(transform.position, openPoint.position) < 0.01f)
+        //    isOpen = true;
+    }
+
+    public void AddTrigger()
+    {
+        currentTriggerCount++;
+        EvaluateDoorState();
+    }
+
+    public void RemoveTrigger()
+    {
+        currentTriggerCount--;
+        if(currentTriggerCount < 0)
+        {
+            currentTriggerCount = 0;
+        }
+        EvaluateDoorState();
+    }
+
+    private void EvaluateDoorState()
+    {
+        if (!useTriggerRequirement)
+            return;
+
+        if (currentTriggerCount >= requiredTriggerCount)
+            OpenDoor();
+        else
+            CloseDoor();
+    }
 
     public void OpenDoor()
     {
         if (isOpen) return;
+
         StartMove(openPoint.position);
         isOpen = true;
-    }
-
-    private void Update()
-    {
-        if(Vector3.Distance(transform.position, closedPoint.position) < 0.01f)
-        {
-            isOpen = false;
-        } else if(Vector3.Distance(transform.position, openPoint.position) < 0.01f)
-        {
-            isOpen=true;
-        }
     }
 
     public void CloseDoor()
     {
         if (!isOpen) return;
+
         StartMove(closedPoint.position);
         isOpen = false;
     }

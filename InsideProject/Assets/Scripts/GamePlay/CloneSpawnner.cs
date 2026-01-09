@@ -75,7 +75,7 @@ public class CloneSpawnner : MonoBehaviour
     }
 
 
-    void DestroyClone()
+    public void DestroyClone()
     {
         cloneSpawnned = false;
         Destroy(clone.gameObject);

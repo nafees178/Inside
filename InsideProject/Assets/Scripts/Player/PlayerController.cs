@@ -114,6 +114,13 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if(_input.resetCheckPointKeyPressed)
+        {
+            SpawnPointManager.instance.Respawn(CheckPointManager.instance.currentCheckPoint);
+            GameManager.instance.ResetStates();
+            GetComponent<CloneSpawnner>().DestroyClone();
+        }
+
         ReadInput();
         LookInput();
         canDash = CanDash();
