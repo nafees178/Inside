@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [System.Serializable]
-public class InputFrame
+public struct InputFrame
 {
     public float time;
     public Vector2 move;

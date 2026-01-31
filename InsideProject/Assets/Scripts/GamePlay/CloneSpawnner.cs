@@ -24,7 +24,6 @@ public class CloneSpawnner : MonoBehaviour
 
     void Update()
     {
-        if (!canSpawnClone) return;
         if (gameObject.GetComponent<PlayerController>().gameObjectController != PlayerController.Controller.Player) return;
         if (cloneSpawnned) return;
         if (recording)
@@ -38,7 +37,8 @@ public class CloneSpawnner : MonoBehaviour
         }
         else
         {
-            if(_input.recordKeyPressed)
+            if (!canSpawnClone) return;
+            if (_input.recordKeyPressed)
             {
                 recordingTime = Time.time;
                 cloneSpawnPosition = transform.position;
@@ -77,6 +77,7 @@ public class CloneSpawnner : MonoBehaviour
 
     public void DestroyClone()
     {
+        if (!cloneSpawnned) return;
         cloneSpawnned = false;
         Destroy(clone.gameObject);
     }

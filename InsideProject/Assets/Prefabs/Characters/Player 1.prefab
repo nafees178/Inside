@@ -18,8 +18,8 @@ GameObject:
   - component: {fileID: 1056960629485705436}
   - component: {fileID: 927858439750109928}
   m_Layer: 0
-  m_Name: Player
-  m_TagString: Player
+  m_Name: Player 1
+  m_TagString: Ghost
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -170,7 +170,7 @@ MonoBehaviour:
   inputDirection: {x: 0, y: 0, z: 0}
   velocity: {x: 0, y: -2.4999998, z: 0}
   controller: {fileID: 0}
-  gameObjectController: 0
+  gameObjectController: 1
 --- !u!114 &8422520849552564105
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -183,7 +183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2ec135353c491f40951e4ab90bae1da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputSourceBehaviour: {fileID: 2643837831073228260}
+  inputSourceBehaviour: {fileID: 1056960629485705436}
   recordedFrames: []
 --- !u!114 &2643837831073228260
 MonoBehaviour:
@@ -224,11 +224,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   recorder: {fileID: 8422520849552564105}
-  clonePrefab: {fileID: 4815066095562622853, guid: f623455361c81f24eb3e11821964e568, type: 3}
+  clonePrefab: {fileID: 4815066095562622853}
   cloneSpawnPosition: {x: 0, y: 0, z: 0}
   cloneSpawnRotation: {x: 0, y: 0, z: 0, w: 0}
-  canSpawnClone: 1
-  maxRecordingTime: 6
+  canSpawnClone: 0
+  maxRecordingTime: 5
   cloneSpawnDelay: 0.5
 --- !u!1 &8589348204338221141
 GameObject:
@@ -240,7 +240,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3403094659787935231}
   - component: {fileID: 6997051108847454759}
-  - component: {fileID: 2637780401380862357}
   - component: {fileID: 2180812910375974420}
   - component: {fileID: 7121356418315266464}
   m_Layer: 0
@@ -301,7 +300,7 @@ Camera:
   field of view: 60
   orthographic: 0
   orthographic size: 5
-  m_Depth: 2
+  m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -316,14 +315,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &2637780401380862357
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8589348204338221141}
-  m_Enabled: 1
 --- !u!114 &2180812910375974420
 MonoBehaviour:
   m_ObjectHideFlags: 0
