@@ -3,14 +3,16 @@ using UnityEngine.SceneManagement;
 
 public class mainmenu : MonoBehaviour
 {
-public void PlayGame()
-    {
-        SceneManager.LoadScene("level1copy");
-    }
+    [SerializeField] string levelName;
 
-public void QuitGame()
-{
-    Application.Quit();
-    Debug.Log("Game Quit");
-}
+    public void PlayGame()
+        {
+            SceneManager.LoadScene(levelName);
+        }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+        Debug.Log("Game Quit");
+    }
 }

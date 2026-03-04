@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using System.Collections.Generic;
 
 public class Trigger : MonoBehaviour
 {
@@ -12,17 +13,29 @@ public class Trigger : MonoBehaviour
     public UnityEvent OnTriggered;
     public UnityEvent OnTriggeredFalse;
 
-    private int activeTriggerCount = 0;
+    private HashSet<Collider> activeColliders = new HashSet<Collider>();
 
     private void OnTriggerEnter(Collider other)
     {
         if (!IsValidTrigger(other)) return;
 
-        activeTriggerCount++;
-
-        if (activeTriggerCount == 1)
+        if (activeColliders.Add(other))
         {
             OnTriggered.Invoke();
+        }
+    }
+    private void Update()
+    {
+        int before = activeColliders.Count;
+
+        activeColliders.RemoveWhere(c => c == null);
+
+        int after = activeColliders.Count;
+
+        // Only fire if something was actually removed
+        if (before > 0 && after == 0)
+        {
+            OnTriggeredFalse.Invoke();
         }
     }
 
@@ -30,10 +43,7 @@ public class Trigger : MonoBehaviour
     {
         if (!IsValidTrigger(other)) return;
 
-        activeTriggerCount--;
-        activeTriggerCount = Mathf.Max(0, activeTriggerCount);
-
-        if (activeTriggerCount == 0)
+        if (activeColliders.Remove(other))
         {
             OnTriggeredFalse.Invoke();
         }

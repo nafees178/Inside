@@ -3,62 +3,93 @@ using UnityEngine;
 
 public class Door : MonoBehaviour
 {
-    [Header("Door Positions")]
+    [Header("Door Type")]
+    public bool rotatableDoor = false;
+
+    [Header("Sliding Door Positions")]
     public Transform closedPoint;
     public Transform openPoint;
 
-    [Header("Movement")]
+    [Header("Rotating Door Parts")]
+    public Transform leftDoor;
+    public Transform rightDoor;
+
+    [Header("Rotation Settings")]
+    public float openAngle = 90f;
+    public float rotationSpeed = 120f;
+
+    [Header("Sliding Settings")]
     public float moveSpeed = 2f;
 
     [Header("Trigger Requirement")]
-    public bool useTriggerRequirement = false;  
-    public int requiredTriggerCount = 2;
+    public bool useTriggerRequirement = false;
+    public int requiredTriggerCount = 1;
 
-    private int currentTriggerCount = 0;
-
-    private Coroutine moveRoutine;
+    [SerializeField] private int currentTriggerCount = 0;
     private bool isOpen = false;
+    private Coroutine moveRoutine;
 
-    private void Update()
+    private Quaternion leftDefaultRot;
+    private Quaternion rightDefaultRot;
+
+    private void Start()
     {
-        //if (Vector3.Distance(transform.position, closedPoint.position) < 0.01f)
-        //    isOpen = false;
-        //else if (Vector3.Distance(transform.position, openPoint.position) < 0.01f)
-        //    isOpen = true;
+        if (rotatableDoor)
+        {
+            if (leftDoor != null)
+                leftDefaultRot = leftDoor.localRotation;
+
+            if (rightDoor != null)
+                rightDefaultRot = rightDoor.localRotation;
+        }
     }
+
+    // ================= TRIGGER FUNCTIONS =================
 
     public void AddTrigger()
     {
         currentTriggerCount++;
-        EvaluateDoorState();
+
+        if (useTriggerRequirement)
+            EvaluateDoorState();
+        else
+            OpenDoor();
     }
 
     public void RemoveTrigger()
     {
         currentTriggerCount--;
-        if(currentTriggerCount < 0)
-        {
+        if (currentTriggerCount < 0)
             currentTriggerCount = 0;
-        }
-        EvaluateDoorState();
+
+        if (useTriggerRequirement)
+            EvaluateDoorState();
+        else
+            CloseDoor();
     }
 
     private void EvaluateDoorState()
     {
-        if (!useTriggerRequirement)
-            return;
-
         if (currentTriggerCount >= requiredTriggerCount)
             OpenDoor();
         else
             CloseDoor();
     }
 
+    // ================= DOOR CONTROL =================
+
     public void OpenDoor()
     {
         if (isOpen) return;
 
-        StartMove(openPoint.position);
+        if (moveRoutine != null)
+            StopCoroutine(moveRoutine);
+
+        if (rotatableDoor)
+            moveRoutine = StartCoroutine(RotateDoor(true));
+        else
+            moveRoutine = StartCoroutine(MoveDoor(openPoint.position));
+
         isOpen = true;
     }
 
@@ -66,17 +97,18 @@ public class Door : MonoBehaviour
     {
         if (!isOpen) return;
 
-        StartMove(closedPoint.position);
-        isOpen = false;
-    }
-
-    private void StartMove(Vector3 targetPosition)
-    {
         if (moveRoutine != null)
             StopCoroutine(moveRoutine);
 
-        moveRoutine = StartCoroutine(MoveDoor(targetPosition));
+        if (rotatableDoor)
+            moveRoutine = StartCoroutine(RotateDoor(false));
+        else
+            moveRoutine = StartCoroutine(MoveDoor(closedPoint.position));
+
+        isOpen = false;
     }
+
+    // ================= SLIDING =================
 
     private IEnumerator MoveDoor(Vector3 target)
     {
@@ -87,9 +119,67 @@ public class Door : MonoBehaviour
                 target,
                 moveSpeed * Time.deltaTime
             );
+
             yield return null;
         }
 
         transform.position = target;
+    }
+
+    // ================= ROTATING =================
+
+    private IEnumerator RotateDoor(bool opening)
+    {
+        Quaternion leftTarget = leftDefaultRot;
+        Quaternion rightTarget = rightDefaultRot;
+
+        if (opening)
+        {
+            if (leftDoor != null)
+                leftTarget = leftDefaultRot * Quaternion.Euler(0, -openAngle, 0);
+
+            if (rightDoor != null)
+                rightTarget = rightDefaultRot * Quaternion.Euler(0, openAngle, 0);
+        }
+
+        while (true)
+        {
+            bool done = true;
+
+            if (leftDoor != null)
+            {
+                leftDoor.localRotation = Quaternion.RotateTowards(
+                    leftDoor.localRotation,
+                    leftTarget,
+                    rotationSpeed * Time.deltaTime
+                );
+
+                if (Quaternion.Angle(leftDoor.localRotation, leftTarget) > 0.1f)
+                    done = false;
+            }
+
+            if (rightDoor != null)
+            {
+                rightDoor.localRotation = Quaternion.RotateTowards(
+                    rightDoor.localRotation,
+                    rightTarget,
+                    rotationSpeed * Time.deltaTime
+                );
+
+                if (Quaternion.Angle(rightDoor.localRotation, rightTarget) > 0.1f)
+                    done = false;
+            }
+
+            if (done)
+                break;
+
+            yield return null;
+        }
+
+        if (leftDoor != null)
+            leftDoor.localRotation = leftTarget;
+
+        if (rightDoor != null)
+            rightDoor.localRotation = rightTarget;
     }
 }
